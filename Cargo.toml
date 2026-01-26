@@ -1,0 +1,11 @@
+[package]
+name = "n64usb"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[dependencies]
+ctrlc = "3.4"
+
+[build-dependencies]
+bindgen = "0.72.1"
