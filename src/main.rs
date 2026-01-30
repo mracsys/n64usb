@@ -21,14 +21,17 @@ mod flashcart {
     pub fn initialize() {unsafe { device_initialize() }}
     pub fn find() -> DeviceError {unsafe { device_find() }}
     pub fn get_cart() -> CartType {unsafe { device_getcart() }}
+    pub fn set_protocol(version: ProtocolVer) {unsafe { device_setprotocol(version); }}
     pub fn open() -> DeviceError {unsafe { device_open() }}
     pub fn close() -> DeviceError {unsafe { device_close() }}
     pub fn read() -> Result<(Header, Vec<u8>), DeviceError> {
         let mut raw_header: u32 = 0;
         let mut buff_ptr: *mut c_uchar = ptr::null_mut();
+        //println!("Starting device read");
         let err = unsafe {
             device_receivedata(&mut raw_header, &mut buff_ptr)
         };
+        //println!("Processing device read");
         if err != DeviceError::OK {
             return Err(err);
         }
@@ -62,6 +65,12 @@ mod flashcart {
     }
 
     impl DeviceError {
+        pub fn value(&self) -> u8 {
+            *self as u8
+        }
+    }
+
+    impl USBDataType {
         pub fn value(&self) -> u8 {
             *self as u8
         }
@@ -122,24 +131,26 @@ impl StateMachine for Worker {
             }
             State::WaitForGame => {
                 match flashcart::read() {
-                    Ok((header, _)) => {
+                    Ok((header, data)) => {
                         if header.datatype == flashcart::USBDataType::HEARTBEAT {
                             println!("Heartbeat detected");
                             sleep(FOR_ONE_SECOND);
                             //State::WaitForGame
                             let msg = "cmdt".as_bytes().to_vec();
+                            
                             let header = flashcart::Header { datatype: flashcart::USBDataType::TEXT, length: msg.len() };
                             println!("Sending cmdt handshake");
                             let status = flashcart::write(header, msg);
                             if status == flashcart::DeviceError::OK {
                                 println!("Handshake sent");
+                                sleep(FOR_ONE_SECOND);
                                 State::Handshake
                             } else {
                                 println!("Failed to send handshake, retrying, {}", status.value());
                                 State::WaitForGame
                             }
                         } else {
-                            println!("Invalid heartbeat");
+                            println!("Invalid heartbeat, {}, {}", header.datatype.value(), String::from_utf8(data).unwrap());
                             sleep(FOR_ONE_SECOND);
                             State::WaitForGame
                         }
@@ -181,15 +192,15 @@ impl StateMachine for Worker {
                                 }
                             }
                         } else {
-                            println!("Invalid handshake reply");
+                            println!("Invalid handshake reply, {}", header.datatype.value());
                             sleep(FOR_ONE_SECOND);
                             State::WaitForGame
                         }
                     }
                     Err(_) => {
-                        println!("No data to read while waiting for heartbeat");
+                        println!("No data to read while waiting for handshake reply");
                         sleep(FOR_ONE_SECOND);
-                        State::WaitForGame
+                        State::Handshake
                     }
                 }
             }
@@ -247,6 +258,7 @@ fn main() {
     }).expect("Error setting Ctrl-C handler");
 
     flashcart::initialize();
+    flashcart::set_protocol(flashcart::ProtocolVer::VERSION2);
     let mut worker = Worker { state: State::Searching, count: 0 };
     println!("Started Multiworld Client. Press 'Ctrl+C' to exit.");
     while running.load(Ordering::SeqCst) && !matches!(worker.state, State::Finished) {
