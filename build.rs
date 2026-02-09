@@ -35,16 +35,23 @@ impl ParseCallbacks for StripEnumPrefix {
 
 
 fn main() {
+    let target_name: &str;
 	#[cfg(target_os = "windows")] {
+        target_name = "windows_x64";
         println!("cargo:rustc-link-lib=shlwapi");
+        println!("cargo:rustc-link-lib=dylib=Flashcart_x64");
+    }
+	#[cfg(target_os = "macos")] {
+        target_name = "macos_aarch64";
+        println!("cargo:rustc-link-lib=dylib=flashcart");
+    }
+	#[cfg(target_os = "linux")] {
+        target_name = "linux_x64";
+        println!("cargo:rustc-link-lib=dylib=flashcart");
     }
     // Tell cargo to look for shared libraries in the specified directory
     let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    println!("cargo:rustc-link-search={}", Path::new(&dir).join("lib").display());
-
-    // Tell cargo to tell rustc to link the system bzip2
-    // shared library.
-    println!("cargo:rustc-link-lib=dylib=Flashcart_x64");
+    println!("cargo:rustc-link-search={}", Path::new(&dir).join("lib").join(target_name).display());
 
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
@@ -75,29 +82,51 @@ fn main() {
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
 
-    // Locate the source and destination
-    let lib_name = "Flashcart_x64.dll";
-    let source = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("lib").join(lib_name);
-    
-    // We want to place it in target/debug or target/release
-    // Path looks like: target/debug/deps/../libflashcart.so
-    let dest_dir = out_path.join("../../../").canonicalize().unwrap();
-    let destination = dest_dir.join(lib_name);
+	#[cfg(not(target_os = "windows"))] {
+        // Locate the source and destination
+        let lib_name = "libflashcart.so";
+        let source = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("lib").join(target_name).join(lib_name);
 
-    if source.exists() {
-        fs::copy(&source, &destination).expect("Could not copy shared library to target directory");
+        // We want to place it in target/debug or target/release
+        // Path looks like: target/debug/deps/../libflashcart.so
+        let dest_dir = out_path.join("../../../").canonicalize().unwrap();
+        let destination = dest_dir.join(lib_name);
+
+        if source.exists() {
+            fs::copy(&source, &destination).expect("Could not copy shared library to target directory");
+        }
+        let destination = dest_dir.join("flashcart.so");
+
+        if source.exists() {
+            fs::copy(&source, &destination).expect("Could not copy shared library to target directory");
+        }
     }
 
-    // Locate the source and destination
-    let lib_name = "Flashcart_x64.pdb";
-    let source = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("lib").join(lib_name);
-    
-    // We want to place it in target/debug or target/release
-    // Path looks like: target/debug/deps/../libflashcart.so
-    let dest_dir = out_path.join("../../../").canonicalize().unwrap();
-    let destination = dest_dir.join(lib_name);
+	#[cfg(target_os = "windows")] {
+        // Locate the source and destination
+        let lib_name = "Flashcart_x64.dll";
+        let source = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("lib").join(target_name).join(lib_name);
 
-    if source.exists() {
-        fs::copy(&source, &destination).expect("Could not copy shared library to target directory");
+        // We want to place it in target/debug or target/release
+        // Path looks like: target/debug/deps/../libflashcart.so
+        let dest_dir = out_path.join("../../../").canonicalize().unwrap();
+        let destination = dest_dir.join(lib_name);
+
+        if source.exists() {
+            fs::copy(&source, &destination).expect("Could not copy shared library to target directory");
+        }
+
+        // Locate the source and destination
+        let lib_name = "Flashcart_x64.pdb";
+        let source = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("lib").join(target_name).join(lib_name);
+
+        // We want to place it in target/debug or target/release
+        // Path looks like: target/debug/deps/../libflashcart.so
+        let dest_dir = out_path.join("../../../").canonicalize().unwrap();
+        let destination = dest_dir.join(lib_name);
+
+        if source.exists() {
+            fs::copy(&source, &destination).expect("Could not copy shared library to target directory");
+        }
     }
 }
