@@ -1,11 +1,10 @@
-[package]
-name = "n64usb"
+[workspace]
+members = ["crate/*"]
+default-members = ["crate/zootr-usb-testing"]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
+authors = ["mracsys <mracsys@gmail.com>"]
 edition = "2024"
-build = "build.rs"
-
-[dependencies]
-ctrlc = "3.4"
-
-[build-dependencies]
-bindgen = "0.72.1"
+repository = "https://github.com/mracsys/n64usb"

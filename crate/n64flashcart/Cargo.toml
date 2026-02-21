@@ -1,0 +1,10 @@
+[package]
+name = "n64flashcart"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+build = "build.rs"
+
+[build-dependencies]
+bindgen = "0.72.1"

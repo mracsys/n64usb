@@ -157,11 +157,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
-name = "n64usb"
+name = "n64flashcart"
 version = "0.1.0"
 dependencies = [
  "bindgen",
- "ctrlc",
 ]
 
 [[package]]
@@ -300,4 +299,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
 dependencies = [
  "windows-link",
+]
+
+[[package]]
+name = "zootr-usb-testing"
+version = "0.1.0"
+dependencies = [
+ "ctrlc",
+ "n64flashcart",
 ]
