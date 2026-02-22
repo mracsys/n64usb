@@ -22,24 +22,24 @@ mod flashcart {
     pub fn read() -> Result<(Header, Vec<u8>), DeviceError> {
         let mut raw_header: u32 = 0;
         let mut buff_ptr: *mut c_uchar = ptr::null_mut();
-        //println!("Starting device read");
         let err = unsafe {
             device_receivedata(&mut raw_header, &mut buff_ptr)
         };
-        //println!("Processing device read");
         if err != DeviceError::OK {
             return Err(err);
         }
-        if buff_ptr.is_null() {
-            return Err(DeviceError::MALLOCFAIL);
-        }
+
         let header = Header {
             datatype: unsafe {std::mem::transmute(raw_header >> 24)},
             length: (raw_header & 0x00FFFFFF) as usize,
         };
-        let data = unsafe {
-            Vec::from_raw_parts(buff_ptr, header.length, header.length)
-        };
+        let mut data: Vec<u8> = vec![];
+        if !buff_ptr.is_null() {
+            data = unsafe {
+                Vec::from_raw_parts(buff_ptr, header.length, header.length)
+            };
+        }
+
         Ok((header, data))
     }
     pub fn write(header: Header, data: Vec<u8>) -> DeviceError {
