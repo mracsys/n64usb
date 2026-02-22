@@ -47,7 +47,7 @@ fn main() {
 
     let arch_dir = match target_arch.as_str() {
         "x86_64"  => "x86_64",
-        "aarch64" => "arm64",
+        "aarch64" => "aarch64",
         other     => panic!("Unsupported arch: {}", other),
     };
 
