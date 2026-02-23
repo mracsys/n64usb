@@ -33,7 +33,7 @@ trait StateMachine {
     fn next(self) -> Self;
 }
 
-const FOR_ONE_SECOND: Duration = time::Duration::from_secs(1);
+const FOR_ONE_SECOND: Duration = time::Duration::from_millis(1);
 
 const ENCODING: [char; 256] = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'あ', 'い', 'う', 'え', 'お', 'か',
@@ -106,11 +106,11 @@ impl StateMachine for Worker {
                                 State::WaitForGame
                             }
                         } else if header.datatype == n64flashcart::USBDataType::EMPTY {
-                            println!("No data to read while waiting for handshake");
+                            //println!("No data to read while waiting for handshake");
                             sleep(FOR_ONE_SECOND);
                             State::WaitForGame
                         } else {
-                            println!("Invalid handshake, {}, {}", header.datatype.value(), String::from_utf8(data).unwrap());
+                            println!("Invalid handshake, {}, {}", header.datatype.value(), data.iter().map(|b| format!("{:02x}", b)).collect::<Vec<String>>().join(" "));
                             sleep(FOR_ONE_SECOND);
                             State::WaitForGame
                         }
@@ -153,7 +153,7 @@ impl StateMachine for Worker {
                                 }
                             }
                         } else if header.datatype == n64flashcart::USBDataType::EMPTY {
-                            println!("No data to read while waiting for handshake reply");
+                            //println!("No data to read while waiting for handshake reply");
                             sleep(FOR_ONE_SECOND);
                             State::Handshake
                         } else {
@@ -171,6 +171,7 @@ impl StateMachine for Worker {
             }
             State::Idle => {
                 let mut reset_connection = false;
+                let mut fatal_error = false;
                 match n64flashcart::read() {
                     Ok((header, data)) => {
                         if header.length == 16 && header.datatype == n64flashcart::USBDataType::RAWBINARY
@@ -179,8 +180,8 @@ impl StateMachine for Worker {
                             reset_connection = true;
                             self.game_state = GameState::Unknown;
                         } else if header.datatype == n64flashcart::USBDataType::HANDSHAKE {
-                            println!("Console requested to restart handshake");
-                            reset_connection = true;
+                            println!("Console requested to restart handshake?");
+                            //reset_connection = true;
                             self.game_state = GameState::Unknown;
                         } else if header.datatype == n64flashcart::USBDataType::HEARTBEAT {
                             println!("Received heartbeat from console, ignoring.");
@@ -193,7 +194,7 @@ impl StateMachine for Worker {
                                     println!("Invalid data received while waiting for item receipt acknowledgement");
                                 }
                             } else if header.datatype == n64flashcart::USBDataType::EMPTY {
-                                println!("No data received while waiting for item receipt acknowledgement");
+                                //println!("No data received while waiting for item receipt acknowledgement");
                             } else {
                                 println!("Non-binary data received while waiting for item receipt acknowledgement");
                             }
@@ -220,14 +221,22 @@ impl StateMachine for Worker {
                     }
                     Err(e) => {
                         println!("Read error, {}", e.value());
+                        match e {
+                            n64flashcart::DeviceError::_64D_BADCMP => {
+                                fatal_error = true;
+                            }
+                            _ => {}
+                        }
                     }
                 }
                 match self.game_state {
                     GameState::InGame => {
-                        if self.count < 10 {
-                            println!("Waiting...{}", 10 - self.count);
+                        if self.count < 10000 {
+                            if self.count % 1000 == 0 {
+                                println!("Waiting...{}", 10 - self.count / 1000);
+                            }
                             self.count += 1;
-                        } else if self.count == 10 {
+                        } else if self.count == 10000 {
                             println!("Giving Light Arrows");
                             let msg: Vec<u8> = vec![0x02, 0x00, 0x5A];
                             let header = n64flashcart::Header { datatype: n64flashcart::USBDataType::RAWBINARY, length: msg.len() };
@@ -239,7 +248,7 @@ impl StateMachine for Worker {
                         }
                     }
                     _ => {
-                        println!("Waiting for game to start");
+                        //println!("Waiting for game to start");
                         self.count = 0;
                     }
                 }
@@ -249,6 +258,8 @@ impl StateMachine for Worker {
                     next_state = State::Closing;
                 } else if reset_connection {
                     next_state = State::WaitForGame;
+                } else if fatal_error {
+                    next_state = State::Closing;
                 } else {
                     next_state = State::Idle;
                 }
