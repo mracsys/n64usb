@@ -27,6 +27,7 @@
         CART_EVERDRIVE = 3,
         CART_SC64      = 4,
         CART_GOPHER64  = 5,
+        CART_WII       = 6,
     } CartType;
 
     typedef enum {

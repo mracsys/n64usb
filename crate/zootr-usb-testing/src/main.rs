@@ -210,6 +210,7 @@ impl StateMachine for Worker {
                             }
                         } else if header.datatype == n64flashcart::USBDataType::INGAME_STATE {
                             println!("Received save context state packet. Length: {}", header.length);
+                            println!("Raw bytes: {}", data.iter().map(|b| format!("{:02x}", b)).collect::<Vec<String>>().join(" "));
                             self.game_state = GameState::InGame;
                         } else if header.datatype == n64flashcart::USBDataType::SAVE_FILENAME && header.length == 16 {
                             let filename: String = data[1..=8].iter().map(|&b| ENCODING[b as usize]).collect();

@@ -56,6 +56,7 @@ mod flashcart {
             CartType::EVERDRIVE => "Everdrive (X7 or V3)",
             CartType::SC64 => "Summercart64",
             CartType::GOPHER64 => "Gopher64",
+            CartType::WII => "Wii",
         })
     }
 
