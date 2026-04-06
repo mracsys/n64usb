@@ -54,16 +54,27 @@
     } SaveType;
 
     typedef enum {
-        DATATYPE_EMPTY         = 0x00,
-        DATATYPE_TEXT          = 0x01,
-        DATATYPE_RAWBINARY     = 0x02,
-        DATATYPE_HEADER        = 0x03,
-        DATATYPE_SCREENSHOT    = 0x04,
-        DATATYPE_HEARTBEAT     = 0x05,
-        DATATYPE_RDBPACKET     = 0x06,
-        DATATYPE_HANDSHAKE     = 0x07,
-        DATATYPE_INGAME_STATE  = 0x08,
-        DATATYPE_SAVE_FILENAME = 0x09,
+        DATATYPE_EMPTY           = 0x00,
+        DATATYPE_TEXT            = 0x01,
+        DATATYPE_RAWBINARY       = 0x02,
+        DATATYPE_HEADER          = 0x03,
+        DATATYPE_SCREENSHOT      = 0x04,
+        DATATYPE_HEARTBEAT       = 0x05,
+        DATATYPE_RDBPACKET       = 0x06,
+        DATATYPE_TCPTEST         = 0x07,
+        DATATYPE_ROMUPLOAD       = 0x08,
+        DATATYPE_HANDSHAKE       = 0x09,
+        DATATYPE_INGAME_STATE    = 0x0A,
+        DATATYPE_SAVE_FILENAME   = 0x0B,
+        DATATYPE_RESET           = 0x0C,
+        DATATYPE_SEND_ITEM       = 0x0D,
+        DATATYPE_ACK_ITEM        = 0x0E,
+        DATATYPE_DUNGEON_REWARDS = 0x0F,
+        DATATYPE_PLAYER_NAMES    = 0x10,
+        DATATYPE_READ_MEMORY     = 0x11,
+        DATATYPE_WRITE_MEMORY    = 0x12,
+        DATATYPE_WRITE_ACK       = 0x13,
+        DATATYPE_UNRECOVERABLE   = 0x14,
     } USBDataType;
 
     typedef enum {
