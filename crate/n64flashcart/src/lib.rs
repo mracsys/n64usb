@@ -17,7 +17,9 @@ mod flashcart {
     pub fn find() -> DeviceError {unsafe { device_find() }}
     pub fn get_cart() -> CartType {unsafe { device_getcart() }}
     pub fn set_protocol(version: ProtocolVer) {unsafe { device_setprotocol(version); }}
+    pub fn get_protocol() {unsafe { device_getprotocol(); }}
     pub fn open() -> DeviceError {unsafe { device_open() }}
+    pub fn isopen() -> bool {unsafe { device_isopen() }}
     pub fn close() -> DeviceError {unsafe { device_close() }}
     pub fn read() -> Result<(Header, Vec<u8>), DeviceError> {
         let mut raw_header: u32 = 0;
