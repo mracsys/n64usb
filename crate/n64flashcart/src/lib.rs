@@ -6,6 +6,7 @@
 mod flashcart {
     use std::ptr;
     use std::os::raw::c_uchar;
+    use std::ffi::CString;
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
     pub struct Header {
@@ -15,6 +16,16 @@ mod flashcart {
 
     pub fn initialize() {unsafe { device_initialize() }}
     pub fn find() -> DeviceError {unsafe { device_find() }}
+    pub fn connect(vid: u16, pid: u16, serial: String) -> DeviceError {
+        let id = ((vid as u32) << 16) | (pid as u32);
+        let serial_ptr = CString::new(serial).expect("serial parameter must be valid string").into_raw();
+        return unsafe {
+            let err = device_connect(id, serial_ptr);
+            // reclaim ownership
+            let _ = CString::from_raw(serial_ptr);
+            err
+        }
+    }
     pub fn get_cart() -> CartType {unsafe { device_getcart() }}
     pub fn set_protocol(version: ProtocolVer) {unsafe { device_setprotocol(version); }}
     pub fn get_protocol() {unsafe { device_getprotocol(); }}

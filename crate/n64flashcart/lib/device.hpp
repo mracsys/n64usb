@@ -148,6 +148,7 @@
     // Main device functions
     void        device_initialize();
     DeviceError device_find();
+    DeviceError device_connect(uint32_t id, char *serial);
     DeviceError device_open();
     uint32_t    device_getmaxromsize();
     uint32_t    device_rompadding(uint32_t romsize);

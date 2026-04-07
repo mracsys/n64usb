@@ -60,6 +60,7 @@ impl StateMachine for Worker {
             State::Searching => {
                 println!("Searching for flashcart");
                 let status = n64flashcart::find();
+                //let status = n64flashcart::connect(0x0403, 0x6001, "BG02Y2TL".to_string());
                 if status == n64flashcart::DeviceError::CARTFINDFAIL {
                     println!("Flashcart disconnected, resetting");
                     n64flashcart::initialize();
