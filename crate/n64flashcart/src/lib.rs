@@ -16,7 +16,7 @@ mod flashcart {
 
     pub fn initialize() {unsafe { device_initialize() }}
     pub fn find() -> DeviceError {unsafe { device_find() }}
-    pub fn connect(vid: u16, pid: u16, serial: String) -> DeviceError {
+    pub fn connect(vid: u16, pid: u16, serial: &str) -> DeviceError {
         let id = ((vid as u32) << 16) | (pid as u32);
         let serial_ptr = CString::new(serial).expect("serial parameter must be valid string").into_raw();
         return unsafe {
