@@ -59,7 +59,7 @@ mod flashcart {
         devices.into_iter().map(|d| {
             let serial = CStr::from_bytes_until_nul(&d.serial.map(|b| b as u8)).unwrap_or_default().to_string_lossy().into_owned();
             let description = CStr::from_bytes_until_nul(&d.description.map(|b| b as u8)).unwrap_or_default().to_string_lossy().into_owned();
-            let label = format!("{} ({:04X}:{:04X} {})", description, &d.vid, &d.pid, serial);
+            let label = format!("{} ({:04X}:{:04X} {})", description, d.vid, d.pid, serial);
             UsbSerialPort { vid: d.vid, pid: d.pid, serial, label }
         }).collect()
     }
