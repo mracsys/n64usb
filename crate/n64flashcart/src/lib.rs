@@ -12,10 +12,10 @@ mod flashcart {
 
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub struct UsbSerialPort {
-        vid: u16,
-        pid: u16,
-        serial: String,
-        label: String,
+        pub vid: u16,
+        pub pid: u16,
+        pub serial: String,
+        pub label: String,
     }
 
     impl Default for UsbSerialPort {
