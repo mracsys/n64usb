@@ -86,8 +86,6 @@ fn main() {
         build.include(format!("{prefix}/include"));
 
         if target_os == "macos" {
-            println!("cargo:rustc-link-lib=static=ncurses");
-            println!("cargo:rustc-link-lib=c++");
             let brew = String::from_utf8(
                 std::process::Command::new("brew")
                 .args(["--prefix"])
@@ -116,14 +114,17 @@ fn main() {
             println!("cargo:rustc-link-lib=framework=IOKit");
             println!("cargo:rustc-link-lib=framework=CoreFoundation");
             println!("cargo:rustc-link-lib=framework=Security");
+            println!("cargo:rustc-link-lib=static=ncurses");
+            println!("cargo:rustc-link-lib=c++");
+            println!("cargo:rustc-link-lib=static=ftdi1");
+            println!("cargo:rustc-link-lib=static=usb-1.0");
         } else {
-            println!("cargo:rustc-link-lib=static=ncursesw");
-            println!("cargo:rustc-link-lib=static=udev");
-            println!("cargo:rustc-link-lib=static=rt");
-            println!("cargo:rustc-link-lib=static=stdc++");
+            println!("cargo:rustc-link-lib=udev");
+            println!("cargo:rustc-link-lib=rt");
+            println!("cargo:rustc-link-lib=stdc++");
+            println!("cargo:rustc-link-lib=ftdi1");
+            println!("cargo:rustc-link-lib=usb-1.0");
         }
-        println!("cargo:rustc-link-lib=static=ftdi1");
-        println!("cargo:rustc-link-lib=static=usb-1.0");
         println!("cargo:rustc-link-lib=pthread");
     }
 
