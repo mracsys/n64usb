@@ -35,7 +35,6 @@ impl ParseCallbacks for StripEnumPrefix {
 fn main() {
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
-    let profile = env::var("PROFILE").unwrap();
 
     let flashcart_sources = [
         "lib/src/device.cpp",
@@ -56,13 +55,11 @@ fn main() {
         build
             .define("_CRT_SECURE_NO_WARNINGS", None)
             .define("D2XX", None)
+            .define("_LIB", None)
             .define("NDEBUG", None)
-            .define("_LIB", None);
-
-        match profile.as_str() {
-            "release" => { build.define("NDEBUG", None); },
-            _ => { build.define("_DEBUG", None); },
-        };
+            .include("lib/Include")
+            .include("lib")
+            .static_crt(false);
 
         match target_arch.as_str() {
             "x86" => {
@@ -71,12 +68,11 @@ fn main() {
             },
             "x86_64" => {
                 println!("cargo:rustc-link-lib=static=ftd2xx_x64");
-
             }
             _ => {},
         };
-
-        println!("cargo:rustc-link-search=native=Include");
+        let include_path = std::fs::canonicalize("lib/Include").unwrap();
+        println!("cargo:rustc-link-search=native={}", include_path.display());
     } else {
         build
             .cpp_set_stdlib(None)

@@ -65,9 +65,9 @@ impl StateMachine for Worker {
                 // SC64
                 //let status = n64flashcart::connect(0x0403, 0x6014, "SC64B0PTEH");
                 // Everdrive X7
-                //let status = n64flashcart::connect(0x0403, 0x6001, "A10MQ5HP");
+                let status = n64flashcart::connect(0x0403, 0x6001, "A10MQ5HP");
                 // Everdrive V3
-                let status = n64flashcart::connect(0x0403, 0x6001, "AC01W748");
+                //let status = n64flashcart::connect(0x0403, 0x6001, "AC01W748");
                 if status == n64flashcart::DeviceError::CARTFINDFAIL {
                     println!("Flashcart disconnected, resetting");
                     n64flashcart::initialize();
