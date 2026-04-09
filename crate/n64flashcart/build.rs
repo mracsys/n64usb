@@ -100,6 +100,7 @@ fn main() {
                 .stdout
             ).unwrap().trim().to_string();
             build.include(format!("{brew}/include"));
+            println!("cargo:rustc-link-search=native={brew}/lib");
         } else {
             println!("cargo:rustc-link-lib=ncursesw");
             println!("cargo:rustc-link-lib=udev");
