@@ -86,7 +86,7 @@ fn main() {
         build.include(format!("{prefix}/include"));
 
         if target_os == "macos" {
-            println!("cargo:rustc-link-lib=ncurses");
+            println!("cargo:rustc-link-lib=static=ncurses");
             println!("cargo:rustc-link-lib=c++");
             let brew = String::from_utf8(
                 std::process::Command::new("brew")
@@ -95,16 +95,35 @@ fn main() {
                 .unwrap()
                 .stdout
             ).unwrap().trim().to_string();
+            let brew_ncurses = String::from_utf8(
+                std::process::Command::new("brew")
+                .args(["--prefix", "ncurses"])
+                .output()
+                .unwrap()
+                .stdout
+            ).unwrap().trim().to_string();
+            let brew_c = String::from_utf8(
+                std::process::Command::new("brew")
+                .args(["--prefix", "llvm"])
+                .output()
+                .unwrap()
+                .stdout
+            ).unwrap().trim().to_string();
             build.include(format!("{brew}/include"));
             println!("cargo:rustc-link-search=native={brew}/lib");
+            println!("cargo:rustc-link-search=native={brew_ncurses}/lib");
+            println!("cargo:rustc-link-search=native={brew_c}/lib");
+            println!("cargo:rustc-link-lib=framework=IOKit");
+            println!("cargo:rustc-link-lib=framework=CoreFoundation");
+            println!("cargo:rustc-link-lib=framework=Security");
         } else {
-            println!("cargo:rustc-link-lib=ncursesw");
-            println!("cargo:rustc-link-lib=udev");
-            println!("cargo:rustc-link-lib=rt");
-            println!("cargo:rustc-link-lib=stdc++");
+            println!("cargo:rustc-link-lib=static=ncursesw");
+            println!("cargo:rustc-link-lib=static=udev");
+            println!("cargo:rustc-link-lib=static=rt");
+            println!("cargo:rustc-link-lib=static=stdc++");
         }
-        println!("cargo:rustc-link-lib=ftdi1");
-        println!("cargo:rustc-link-lib=usb-1.0");
+        println!("cargo:rustc-link-lib=static=ftdi1");
+        println!("cargo:rustc-link-lib=static=usb-1.0");
         println!("cargo:rustc-link-lib=pthread");
     }
 
