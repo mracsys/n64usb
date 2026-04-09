@@ -1,7 +1,5 @@
 use std::env;
 use std::path::PathBuf;
-use std::path::Path;
-use std::fs;
 
 use bindgen::callbacks::{EnumVariantValue, ParseCallbacks};
 
@@ -37,29 +35,86 @@ impl ParseCallbacks for StripEnumPrefix {
 fn main() {
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     let target_arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
-    let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let profile = env::var("PROFILE").unwrap();
+
+    let flashcart_sources = [
+        "lib/src/device.cpp",
+        "lib/src/device_usb.cpp",
+        "lib/src/device_64drive.cpp",
+        "lib/src/device_everdrive.cpp",
+        "lib/src/device_sc64.cpp",
+        "lib/src/device_gopher64.cpp",
+        "lib/src/device_wii.cpp",
+    ];
+
+    let mut build = cc::Build::new();
+    build.cpp(true);
+
 	if target_os == "windows" {
         println!("cargo:rustc-link-lib=shlwapi");
-        println!("cargo:rustc-link-lib=dylib=Flashcart_x64");
+
+        build
+            .define("_CRT_SECURE_NO_WARNINGS", None)
+            .define("D2XX", None)
+            .define("NDEBUG", None)
+            .define("_LIB", None);
+
+        match profile.as_str() {
+            "release" => { build.define("NDEBUG", None); },
+            _ => { build.define("_DEBUG", None); },
+        };
+
+        match target_arch.as_str() {
+            "x86" => {
+                build.define("WIN32", None);
+                println!("cargo:rustc-link-lib=static=ftd2xx");
+            },
+            "x86_64" => {
+                println!("cargo:rustc-link-lib=static=ftd2xx_x64");
+
+            }
+            _ => {},
+        };
+
+        println!("cargo:rustc-link-search=native=Include");
     } else {
-        println!("cargo:rustc-link-lib=dylib=flashcart");
+        build
+            .cpp_set_stdlib(None)
+            .flag("-std=c++11")
+            .define("LINUX", None)
+            .define("_XOPEN_SOURCE_EXTENDED", None)
+            .flag("-Wall")
+            .flag("-Wno-unknown-pragmas");
+
+        let prefix = env::var("PREFIX").unwrap_or_else(|_| "/usr/local".to_string());
+        build.include(format!("{prefix}/include"));
+
+        if target_os == "macos" {
+            println!("cargo:rustc-link-lib=ncurses");
+            println!("cargo:rustc-link-lib=c++");
+            let brew = String::from_utf8(
+                std::process::Command::new("brew")
+                .args(["--prefix"])
+                .output()
+                .unwrap()
+                .stdout
+            ).unwrap().trim().to_string();
+            build.include(format!("{brew}/include"));
+        } else {
+            println!("cargo:rustc-link-lib=ncursesw");
+            println!("cargo:rustc-link-lib=udev");
+            println!("cargo:rustc-link-lib=rt");
+            println!("cargo:rustc-link-lib=stdc++");
+        }
+        println!("cargo:rustc-link-lib=ftdi1");
+        println!("cargo:rustc-link-lib=usb-1.0");
+        println!("cargo:rustc-link-lib=pthread");
     }
 
-    let arch_dir = match target_arch.as_str() {
-        "x86_64"  => "x86_64",
-        "aarch64" => "aarch64",
-        other     => panic!("Unsupported arch: {}", other),
-    };
-
-    let os_dir = match target_os.as_str() {
-        "linux"   => "linux",
-        "windows" => "windows",
-        "macos"   => "macos",
-        other     => panic!("Unsupported OS: {}", other),
-    };
-
-    // Tell cargo to look for shared libraries in the specified directory
-    println!("cargo:rustc-link-search={}", Path::new(&dir).join("lib").join(os_dir).join(arch_dir).display());
+    for src in &flashcart_sources {
+        build.file(src);
+    }
+    build.compile("flashcart");
 
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
@@ -67,7 +122,7 @@ fn main() {
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate
         // bindings for.
-        .header("lib/device.hpp")
+        .header("lib/src/device.hpp")
         .allowlist_function("device_.*")
         .parse_callbacks(Box::new(StripEnumPrefix))
         .rustified_enum(".*")
@@ -90,35 +145,4 @@ fn main() {
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
 
-    if target_os == "windows" {
-        copy_lib_to_output(os_dir, arch_dir, "Flashcart_x64.dll", "");
-        copy_lib_to_output(os_dir, arch_dir, "Flashcart_x64.pdb", "");
-    } else {
-        copy_lib_to_output(os_dir, arch_dir, "libflashcart.so", "flashcart.so");
-    }
-}
-
-
-fn copy_lib_to_output(os_dir: &str, arch_dir: &str, lib_name: &str, out_name_override: &str) {
-    // Locate the source and destination
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let source = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap()).join("lib").join(os_dir).join(arch_dir).join(lib_name);
-
-    // We want to place it in target/debug or target/release
-    // Path looks like: target/debug/deps/../libflashcart.so
-    let dest_dir = out_path.join("../../../").canonicalize().unwrap();
-    let destination = dest_dir.join(lib_name);
-
-    if source.exists() {
-        fs::copy(&source, &destination).expect("Could not copy shared library to target directory");
-    }
-    let mut dest_name = out_name_override;
-    if out_name_override == "" {
-        dest_name = lib_name;
-    }
-    let destination = dest_dir.join(dest_name);
-
-    if source.exists() {
-        fs::copy(&source, &destination).expect("Could not copy shared library to target directory");
-    }
 }

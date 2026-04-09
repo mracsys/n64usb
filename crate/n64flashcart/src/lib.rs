@@ -59,7 +59,24 @@ mod flashcart {
         devices.into_iter().map(|d| {
             let serial = CStr::from_bytes_until_nul(&d.serial.map(|b| b as u8)).unwrap_or_default().to_string_lossy().into_owned();
             let description = CStr::from_bytes_until_nul(&d.description.map(|b| b as u8)).unwrap_or_default().to_string_lossy().into_owned();
-            let label = format!("{} ({:04X}:{:04X} {})", description, d.vid, d.pid, serial);
+            let mut cartname = "";
+            if d.pid == 0x6001 && description == "FT245R USB FIFO" {
+                cartname = "Everdrive";
+            } else if d.pid == 0x6001 {
+                cartname = "Wii";
+            }
+            if d.pid == 0x6014 && description == "SC64" {
+                cartname = "Summercart";
+            } else if (d.pid == 0x6014 || d.pid == 0x6010) && (description == "64drive USB device" || description == "64drive USB device A") {
+                cartname = "64drive";
+            } else if d.pid == 0x6014 {
+                cartname = "Wii";
+            }
+            if d.pid == 0x6015 {
+                cartname = "Wii";
+            }
+
+            let label = format!("{} ({:04X}:{:04X} {})", cartname, d.vid, d.pid, serial);
             UsbSerialPort { vid: d.vid, pid: d.pid, serial, label }
         }).collect()
     }

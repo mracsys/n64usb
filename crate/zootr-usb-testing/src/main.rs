@@ -59,8 +59,15 @@ impl StateMachine for Worker {
         self.state = match self.state {
             State::Searching => {
                 println!("Searching for flashcart");
-                let status = n64flashcart::find();
-                //let status = n64flashcart::connect(0x0403, 0x6001, "BG02Y2TL".to_string());
+                //let status = n64flashcart::find();
+                // Wii
+                //let status = n64flashcart::connect(0x0403, 0x6001, "BG02Y2TL");
+                // SC64
+                //let status = n64flashcart::connect(0x0403, 0x6014, "SC64B0PTEH");
+                // Everdrive X7
+                //let status = n64flashcart::connect(0x0403, 0x6001, "A10MQ5HP");
+                // Everdrive V3
+                let status = n64flashcart::connect(0x0403, 0x6001, "AC01W748");
                 if status == n64flashcart::DeviceError::CARTFINDFAIL {
                     println!("Flashcart disconnected, resetting");
                     n64flashcart::initialize();
@@ -295,6 +302,12 @@ fn main() {
 
     n64flashcart::initialize();
     n64flashcart::set_protocol(n64flashcart::ProtocolVer::VERSION2);
+
+    let devices = n64flashcart::list();
+    for d in devices {
+        println!("{:?}", d);
+    }
+
     let mut worker = Worker {
         state: State::Searching,
         count: 0,
