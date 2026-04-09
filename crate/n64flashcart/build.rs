@@ -59,7 +59,7 @@ fn main() {
             .define("NDEBUG", None)
             .include("lib/Include")
             .include("lib")
-            .static_crt(false);
+            .static_crt(true);
 
         match target_arch.as_str() {
             "x86" => {
