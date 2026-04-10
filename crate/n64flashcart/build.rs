@@ -122,6 +122,8 @@ fn main() {
 			// Requires the distro to provide static versions of
 			// required libraries. On Debian:
 			// sudo apt install llvm libclang-dev libftdi1-dev libudev-dev
+            // Additional packages for Mido's House GUI (not needed for this crate):
+            // sudo apt install pkg-config libglib2.0-dev
 			let lib_arch = match target_arch.as_str() {
 				"x86_64"  => "x86_64-linux-gnu",
 				"x86"     => "i386-linux-gnu",
