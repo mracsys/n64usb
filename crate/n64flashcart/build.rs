@@ -119,11 +119,22 @@ fn main() {
             println!("cargo:rustc-link-lib=static=ftdi1");
             println!("cargo:rustc-link-lib=static=usb-1.0");
         } else {
+			// Requires the distro to provide static versions of
+			// required libraries. On Debian:
+			// sudo apt install llvm libclang-dev libftdi1-dev libudev-dev
+			let lib_arch = match target_arch.as_str() {
+				"x86_64"  => "x86_64-linux-gnu",
+				"x86"     => "i386-linux-gnu",
+				"aarch64" => "aarch64-linux-gnu",
+				"arm"     => "arm-linux-gnueabihf",
+				_         => "x86_64-linux-gnu",
+			};
+			println!("cargo:rustc-link-search=native=/usr/lib/{lib_arch}");
             println!("cargo:rustc-link-lib=udev");
             println!("cargo:rustc-link-lib=rt");
             println!("cargo:rustc-link-lib=stdc++");
-            println!("cargo:rustc-link-lib=ftdi1");
-            println!("cargo:rustc-link-lib=usb-1.0");
+            println!("cargo:rustc-link-lib=static=ftdi1");
+            println!("cargo:rustc-link-lib=static=usb-1.0");
         }
         println!("cargo:rustc-link-lib=pthread");
     }
