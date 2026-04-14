@@ -68,13 +68,12 @@
         DATATYPE_SAVE_FILENAME   = 0x0B,
         DATATYPE_RESET           = 0x0C,
         DATATYPE_SEND_ITEM       = 0x0D,
-        DATATYPE_ACK_ITEM        = 0x0E,
+        DATATYPE_ACK_MESSAGE     = 0x0E,
         DATATYPE_DUNGEON_REWARDS = 0x0F,
         DATATYPE_PLAYER_NAMES    = 0x10,
         DATATYPE_READ_MEMORY     = 0x11,
         DATATYPE_WRITE_MEMORY    = 0x12,
-        DATATYPE_WRITE_ACK       = 0x13,
-        DATATYPE_UNRECOVERABLE   = 0x14,
+        DATATYPE_UNRECOVERABLE   = 0x13,
     } USBDataType;
 
     typedef enum {
