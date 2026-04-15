@@ -102,8 +102,10 @@ mod flashcart {
         let err = unsafe {
             device_receivedata(&mut raw_header, &mut buff_ptr)
         };
-        if err != DeviceError::OK {
-            return Err(err);
+        match err {
+            DeviceError::OK => {}
+            DeviceError::BADPADDING => { purge() }
+            _ => { return Err(err); }
         }
 
         let header = Header {
@@ -124,6 +126,7 @@ mod flashcart {
             device_senddata(header.datatype, data.as_ptr() as *mut u8, header.length as u32)
         }
     }
+    pub fn purge() {unsafe { device_purgedata() }}
 
     pub fn cart_type_to_str(cart: CartType) -> String {
         String::from(match cart {

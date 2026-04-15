@@ -305,12 +305,13 @@ USBStatus device_usb_read(USBHandle handle, void* buffer, uint32_t size, uint32_
             if (device_usb_getqueuestatus(handle, NULL) != USB_OK)
                 break;
             if (difftime(curtime, start) >= timeout)
-                return USB_IO_ERROR;
+                return USB_TIMEOUT;
         }
 
-        // Copy the data
+        // Unable to read all of the requested data
         if (readcount > readbuffer_left)
-            readcount = readbuffer_left;
+            return USB_IO_ERROR;
+        // Copy the data
         memcpy(buffer, readbuffer+readbuffer_readoffset, readcount);
         readbuffer_left -= readcount;
         (*read) = readcount;
@@ -357,6 +358,19 @@ USBStatus device_usb_getqueuestatus(USBHandle handle, uint32_t* bytesleft)
             (*bytesleft) = readbuffer_left;
         return USB_OK;
     #endif
+}
+
+
+/*==============================
+    device_usb_purgequeue
+    Purges the incoming USB data
+==============================*/
+
+void device_usb_purgequeue()
+{
+    readbuffer_left = 0;
+    readbuffer_copyoffset = 0;
+    readbuffer_readoffset = 0;
 }
 
 

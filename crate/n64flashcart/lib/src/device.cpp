@@ -617,6 +617,16 @@ DeviceError device_receivedata(uint32_t* dataheader, byte** buff)
 
 
 /*==============================
+    device_purgedata
+    Clears the read buffer
+==============================*/
+
+void device_purgedata() {
+    device_usb_purgequeue();
+}
+
+
+/*==============================
     device_close
     Calls the function to close the flashcart
     @param The device error, or OK

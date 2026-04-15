@@ -48,6 +48,7 @@
         USB_NOT_SUPPORTED,
         USB_OTHER_ERROR,
         USB_DEVICE_LIST_NOT_READY,
+        USB_TIMEOUT,
     };
 
     typedef void*    USBHandle;
@@ -78,6 +79,7 @@
     USBStatus device_usb_write(USBHandle handle, void* buffer, uint32_t size, uint32_t* written);
     USBStatus device_usb_read(USBHandle handle, void* buffer, uint32_t size, uint32_t* read);
     USBStatus device_usb_getqueuestatus(USBHandle handle, uint32_t* bytesleft);
+    void device_usb_purgequeue();
 
     USBStatus device_usb_resetdevice(USBHandle handle);
     USBStatus device_usb_settimeouts(USBHandle handle, uint32_t readtimout, uint32_t writetimout);

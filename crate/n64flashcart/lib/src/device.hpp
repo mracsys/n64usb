@@ -122,6 +122,8 @@
 /* 37 */DEVICEERR_SC64_CTRLRESETFAIL,
 /* 38 */DEVICEERR_SC64_FIRMWARECHECKFAIL,
 /* 39 */DEVICEERR_SC64_FIRMWAREUNSUPPORTED,
+/* 40 */DEVICEERR_BADHEADER,
+/* 41 */DEVICEERR_BADPADDING,
     } DeviceError;
 
 
@@ -165,6 +167,7 @@
     DeviceError device_sendrom(FILE* rom, uint32_t filesize);
     DeviceError device_senddata(USBDataType datatype, byte* data, uint32_t size);
     DeviceError device_receivedata(uint32_t* dataheader, byte** buff);
+    void        device_purgedata();
     DeviceError device_close();
 
     // Device configuration

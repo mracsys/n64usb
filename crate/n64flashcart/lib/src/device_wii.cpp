@@ -178,7 +178,7 @@ DeviceError device_receivedata_wii(CartDevice* cart, uint32_t* dataheader, byte*
         // Get information about the incoming data and store it in dataheader
         if (device_usb_read(fthandle->handle, temp, 4, &fthandle->bytes_read) != USB_OK)
         {
-            return DEVICEERR_READFAIL;
+            return DEVICEERR_BADHEADER;
         }
         (*dataheader) = swap_endian(temp[3] << 24 | temp[2] << 16 | temp[1] << 8 | temp[0]);
         totalread += fthandle->bytes_read;
@@ -198,6 +198,7 @@ DeviceError device_receivedata_wii(CartDevice* cart, uint32_t* dataheader, byte*
                 readamount = 62 - offset;
             if (device_usb_read(fthandle->handle, (*buff)+dataread, readamount, &fthandle->bytes_read) != USB_OK)
             {
+                free((*buff));
                 return DEVICEERR_READFAIL;
             }
             totalread += fthandle->bytes_read;
@@ -213,7 +214,8 @@ DeviceError device_receivedata_wii(CartDevice* cart, uint32_t* dataheader, byte*
             int left = alignment - (totalread % alignment);
             if (device_usb_read(fthandle->handle, tempbuff, left, &fthandle->bytes_read) != USB_OK)
             {
-                return DEVICEERR_READFAIL;
+                free(tempbuff);
+                return DEVICEERR_BADPADDING;
             }
             free(tempbuff);
         }

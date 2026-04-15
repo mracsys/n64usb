@@ -507,13 +507,13 @@ DeviceError device_receivedata_64drive(CartDevice* cart, uint32_t* dataheader, b
 
         // Ensure we have valid data by reading the header
         if (device_usb_read(fthandle->handle, temp, 4, &fthandle->bytes_read) != USB_OK)
-            return DEVICEERR_READFAIL;
+            return DEVICEERR_64D_BADDMA;
         if (temp[0] != 'D' || temp[1] != 'M' || temp[2] != 'A' || temp[3] != '@')
             return DEVICEERR_64D_BADDMA;
 
         // Get information about the incoming data and store it in dataheader
         if (device_usb_read(fthandle->handle, temp, 4, &fthandle->bytes_read) != USB_OK)
-            return DEVICEERR_READFAIL;
+            return DEVICEERR_BADHEADER;
         (*dataheader) = swap_endian(temp[3] << 24 | temp[2] << 16 | temp[1] << 8 | temp[0]);
 
         // Read the data into the buffer, in 512 byte chunks
@@ -530,16 +530,25 @@ DeviceError device_receivedata_64drive(CartDevice* cart, uint32_t* dataheader, b
             if (readamount > 512)
                 readamount = 512;
             if (device_usb_read(fthandle->handle, (*buff)+read, readamount, &fthandle->bytes_read) != USB_OK)
+            {
+                free((*buff));
                 return DEVICEERR_READFAIL;
+            }
             read += fthandle->bytes_read;
             device_setuploadprogress((((float)read)/((float)size))*100.0f);
         }
 
         // Read the completion signal
         if (device_usb_read(fthandle->handle, temp, 4, &fthandle->bytes_read) != USB_OK)
-            return DEVICEERR_READFAIL;
-        if (temp[0] != 'C' || temp[1] != 'M' || temp[2] != 'P' || temp[3] != 'H')
+        {
+            free((*buff));
             return DEVICEERR_64D_BADCMP;
+        }
+        if (temp[0] != 'C' || temp[1] != 'M' || temp[2] != 'P' || temp[3] != 'H')
+        {
+            free((*buff));
+            return DEVICEERR_64D_BADCMP;
+        }
         device_setuploadprogress(100.0f);
     }
     else
