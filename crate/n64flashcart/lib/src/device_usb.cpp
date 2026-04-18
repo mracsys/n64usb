@@ -158,7 +158,6 @@ USBStatus device_usb_open(SerialDevice* device, USBHandle* handle)
         return FT_OpenEx((void*)device->serial, FT_OPEN_BY_SERIAL_NUMBER, handle);
     #else
         // Open the device
-        printf("Opening device");
         if (ftdi_usb_open_desc(context, device->vid, device->pid, device->description, device->serial) < 0)
             return USB_DEVICE_NOT_OPENED;
         (*handle) = (void*)context;
