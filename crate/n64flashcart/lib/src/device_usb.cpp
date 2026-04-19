@@ -367,9 +367,13 @@ USBStatus device_usb_getqueuestatus(USBHandle handle, uint32_t* bytesleft)
 
 void device_usb_purgequeue()
 {
-    readbuffer_left = 0;
-    readbuffer_copyoffset = 0;
-    readbuffer_readoffset = 0;
+    #ifdef D2XX
+        return;
+    #else
+        readbuffer_left = 0;
+        readbuffer_copyoffset = 0;
+        readbuffer_readoffset = 0;
+    #endif
 }
 
 
