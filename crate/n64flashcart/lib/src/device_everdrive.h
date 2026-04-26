@@ -17,6 +17,7 @@
     bool        device_explicitcic_everdrive(byte* bootcode);
     DeviceError device_testdebug_everdrive(CartDevice* cart);
     DeviceError device_senddata_everdrive(CartDevice* cart, USBDataType datatype, byte* data, uint32_t size);
+    DeviceError device_sendrawdata_everdrive(CartDevice* cart, byte* data, uint32_t size);
     DeviceError device_receivedata_everdrive(CartDevice* cart, uint32_t* dataheader, byte** buff);
     DeviceError device_close_everdrive(CartDevice* cart);
 

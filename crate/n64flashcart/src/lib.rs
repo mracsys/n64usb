@@ -126,6 +126,11 @@ mod flashcart {
             device_senddata(header.datatype, data.as_ptr() as *mut u8, header.length as u32)
         }
     }
+    pub fn write_raw(data: Vec<u8>, size: u32) -> DeviceError {
+        unsafe {
+            device_sendrawdata(data.as_ptr() as *mut u8, size)
+        }
+    }
     pub fn purge() {unsafe { device_purgedata() }}
 
     pub fn cart_type_to_str(cart: CartType) -> String {

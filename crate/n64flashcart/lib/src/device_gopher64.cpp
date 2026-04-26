@@ -285,6 +285,35 @@ DeviceError device_senddata_gopher64(CartDevice *cart, USBDataType datatype, byt
 }
 
 /*==============================
+    device_sendrawdata_gopher64
+    Sends data to Gopher64
+    @param  A pointer to the cart context
+    @param  A buffer containing said data
+    @param  The size of the data
+    @return The device error, or OK
+==============================*/
+
+DeviceError device_sendrawdata_gopher64(CartDevice *cart, byte *data, uint32_t size)
+{
+    // assume data header is embedded in first four bytes of the data stream
+    USBDataType datatype = (USBDataType)data[0];
+    //uint32_t datasize = swap_endian((data[1] << 16) | (data[2] << 8) | (data[3] << 0));
+
+    // extract header from raw data
+    uint32_t newsize = size - 4;
+    byte* datacopy = (byte*) calloc(newsize, 1);
+    if (datacopy == NULL)
+        return DEVICEERR_MALLOCFAIL;
+    memcpy(datacopy, data+4, newsize);
+
+    DeviceError err = device_senddata_gopher64(cart, datatype, datacopy, newsize);
+
+    free(datacopy);
+
+    return err;
+}
+
+/*==============================
     device_receivedata_gopher64
     Receives data from Gopher64
     @param  A pointer to the cart context

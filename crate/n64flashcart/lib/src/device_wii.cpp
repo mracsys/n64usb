@@ -133,14 +133,46 @@ DeviceError device_senddata_wii(CartDevice* cart, USBDataType datatype, byte* da
             bytes_do = bytes_left;
         if (device_usb_write(fthandle->handle, datacopy+bytes_done, bytes_do, &fthandle->bytes_written) != USB_OK)
             return DEVICEERR_WRITEFAIL;
-        bytes_left -= bytes_do;
-        bytes_done += bytes_do;
+        bytes_left -= fthandle->bytes_written;
+        bytes_done += fthandle->bytes_written;
         device_setuploadprogress((((float)bytes_done)/((float)newsize))*100.0f);
     }
 
     // Free used up resources
     device_setuploadprogress(100.0f);
     free(datacopy);
+    return DEVICEERR_OK;
+}
+
+
+/*==============================
+    device_sendrawdata_wii
+    Sends raw data to the Wii, no headers/footers
+    @param  A pointer to the cart context
+    @param  A buffer containing said data
+    @param  The size of the data
+    @return The device error, or OK
+==============================*/
+
+DeviceError device_sendrawdata_wii(CartDevice* cart, byte* data, uint32_t size)
+{
+    WiiHandle* fthandle = (WiiHandle*)cart->structure;
+    uint32_t bytes_done = 0;
+    uint32_t bytes_left = size;
+
+    // Send the data in chunks
+    // Wii USB hardware buffer is 64 bytes, but needs space for FTDI status bytes
+    while (bytes_left > 0)
+    {
+        uint32_t bytes_do = 62;
+        if (bytes_left < 62)
+            bytes_do = bytes_left;
+        if (device_usb_write(fthandle->handle, data+bytes_done, bytes_do, &fthandle->bytes_written) != USB_OK)
+            return DEVICEERR_WRITEFAIL;
+        bytes_left -= fthandle->bytes_written;
+        bytes_done += fthandle->bytes_written;
+    }
+
     return DEVICEERR_OK;
 }
 

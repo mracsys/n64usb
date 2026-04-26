@@ -166,6 +166,7 @@
     DeviceError device_testdebug();
     DeviceError device_sendrom(FILE* rom, uint32_t filesize);
     DeviceError device_senddata(USBDataType datatype, byte* data, uint32_t size);
+    DeviceError device_sendrawdata(byte* data, uint32_t size);
     DeviceError device_receivedata(uint32_t* dataheader, byte** buff);
     void        device_purgedata();
     DeviceError device_close();

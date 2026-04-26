@@ -45,6 +45,7 @@
     bool        device_explicitcic_64drive2(byte* bootcode);
     DeviceError device_testdebug_64drive(CartDevice* cart);
     DeviceError device_senddata_64drive(CartDevice* cart, USBDataType datatype, byte* data, uint32_t size);
+    DeviceError device_sendrawdata_64drive(CartDevice* cart, byte* data, uint32_t size);
     DeviceError device_receivedata_64drive(CartDevice* cart, uint32_t* dataheader, byte** buff);
     DeviceError device_close_64drive(CartDevice* cart);
 

@@ -17,6 +17,7 @@
     bool        device_explicitcic_wii(byte* bootcode);
     DeviceError device_testdebug_wii(CartDevice* cart);
     DeviceError device_senddata_wii(CartDevice* cart, USBDataType datatype, byte* data, uint32_t size);
+    DeviceError device_sendrawdata_wii(CartDevice* cart, byte* data, uint32_t size);
     DeviceError device_receivedata_wii(CartDevice* cart, uint32_t* dataheader, byte** buff);
     DeviceError device_close_wii(CartDevice* cart);
 

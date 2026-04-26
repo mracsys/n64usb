@@ -427,8 +427,8 @@ DeviceError device_senddata_everdrive(CartDevice* cart, USBDataType datatype, by
             bytes_do = bytes_left;
         if (device_usb_write(fthandle->handle, datacopy+bytes_done, bytes_do, &fthandle->bytes_written) != USB_OK)
             return DEVICEERR_WRITEFAIL;
-        bytes_left -= bytes_do;
-        bytes_done += bytes_do;
+        bytes_left -= fthandle->bytes_written;
+        bytes_done += fthandle->bytes_written;
         device_setuploadprogress((((float)bytes_done)/((float)newsize))*100.0f);
     }
 
@@ -450,6 +450,37 @@ DeviceError device_senddata_everdrive(CartDevice* cart, USBDataType datatype, by
     // Free used up resources
     device_setuploadprogress(100.0f);
     free(datacopy);
+    return DEVICEERR_OK;
+}
+
+
+/*==============================
+    device_sendrawdata_everdrive
+    Sends raw data to the EverDrive, no header/footer
+    @param  A pointer to the cart context
+    @param  A buffer containing said data
+    @param  The size of the data
+    @return The device error, or OK
+==============================*/
+
+DeviceError device_sendrawdata_everdrive(CartDevice* cart, byte* data, uint32_t size)
+{
+    ED64Handle* fthandle = (ED64Handle*)cart->structure;
+    uint32_t bytes_done = 0;
+    uint32_t bytes_left = size;
+
+    // Send the data in chunks
+    while (bytes_left > 0)
+    {
+        uint32_t bytes_do = 512;
+        if (bytes_left < 512)
+            bytes_do = bytes_left;
+        if (device_usb_write(fthandle->handle, data+bytes_done, bytes_do, &fthandle->bytes_written) != USB_OK)
+            return DEVICEERR_WRITEFAIL;
+        bytes_left -= fthandle->bytes_written;
+        bytes_done += fthandle->bytes_written;
+    }
+
     return DEVICEERR_OK;
 }
 

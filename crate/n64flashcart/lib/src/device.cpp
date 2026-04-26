@@ -31,6 +31,7 @@ uint32_t    (*funcPointer_rompadding)(uint32_t romsize);
 bool        (*funcPointer_explicitcic)(byte* bootcode);
 uint32_t    (*funcPointer_maxromsize)();
 DeviceError (*funcPointer_senddata)(CartDevice*, USBDataType datatype, byte* data, uint32_t size);
+DeviceError (*funcPointer_sendrawdata)(CartDevice*, byte* data, uint32_t size);
 DeviceError (*funcPointer_receivedata)(CartDevice*, uint32_t* dataheader, byte** buff);
 DeviceError (*funcPointer_close)(CartDevice*);
 
@@ -311,6 +312,7 @@ static void device_set_64drive1(CartDevice* cart)
     funcPointer_sendrom = &device_sendrom_64drive;
     funcPointer_testdebug = &device_testdebug_64drive;
     funcPointer_senddata = &device_senddata_64drive;
+    funcPointer_sendrawdata = &device_sendrawdata_64drive;
     funcPointer_receivedata = &device_receivedata_64drive;
     funcPointer_close = &device_close_64drive;
 }
@@ -354,6 +356,7 @@ static void device_set_everdrive(CartDevice* cart)
     funcPointer_sendrom = &device_sendrom_everdrive;
     funcPointer_testdebug = &device_testdebug_everdrive;
     funcPointer_senddata = &device_senddata_everdrive;
+    funcPointer_sendrawdata = &device_sendrawdata_everdrive;
     funcPointer_receivedata = &device_receivedata_everdrive;
     funcPointer_close = &device_close_everdrive;
 }
@@ -379,6 +382,7 @@ static void device_set_sc64(CartDevice* cart)
     funcPointer_sendrom = &device_sendrom_sc64;
     funcPointer_testdebug = &device_testdebug_sc64;
     funcPointer_senddata = &device_senddata_sc64;
+    funcPointer_sendrawdata = &device_sendrawdata_sc64;
     funcPointer_receivedata = &device_receivedata_sc64;
     funcPointer_close = &device_close_sc64;
 }
@@ -404,6 +408,7 @@ static void device_set_gopher64(CartDevice* cart)
     funcPointer_sendrom = &device_sendrom_gopher64;
     funcPointer_testdebug = &device_testdebug_gopher64;
     funcPointer_senddata = &device_senddata_gopher64;
+    funcPointer_sendrawdata = &device_sendrawdata_gopher64;
     funcPointer_receivedata = &device_receivedata_gopher64;
     funcPointer_close = &device_close_gopher64;
 }
@@ -429,6 +434,7 @@ static void device_set_wii(CartDevice* cart)
     funcPointer_sendrom = &device_sendrom_wii;
     funcPointer_testdebug = &device_testdebug_wii;
     funcPointer_senddata = &device_senddata_wii;
+    funcPointer_sendrawdata = &device_sendrawdata_wii;
     funcPointer_receivedata = &device_receivedata_wii;
     funcPointer_close = &device_close_wii;
 }
@@ -596,6 +602,20 @@ DeviceError device_testdebug()
 DeviceError device_senddata(USBDataType datatype, byte* data, uint32_t size)
 {
     return funcPointer_senddata(&local_cart, datatype, data, size);
+}
+
+
+/*==============================
+    device_sendrawdata
+    Sends data to the connected flashcart
+    @param  A buffer containing said data
+    @param  The size of the data
+    @return The device error, or OK
+==============================*/
+
+DeviceError device_sendrawdata(byte* data, uint32_t size)
+{
+    return funcPointer_sendrawdata(&local_cart, data, size);
 }
 
 

@@ -689,6 +689,40 @@ DeviceError device_senddata_sc64(CartDevice *cart, USBDataType datatype, byte *d
 }
 
 /*==============================
+    device_sendrawdata_sc64
+    Sends raw data to the SC64, allows misaligned data size
+    @param  A pointer to the cart context
+    @param  A buffer containing said data
+    @param  The size of the data
+    @return The device error, or OK
+==============================*/
+
+DeviceError device_sendrawdata_sc64(CartDevice *cart, byte *data, uint32_t size)
+{
+    DeviceError err;
+    SC64Device *device = (SC64Device *)cart->structure;
+
+    // assume data header is embedded in first four bytes of the data stream
+    uint32_t datatype = data[0];
+    uint32_t datasize = swap_endian((data[1] << 16) | (data[2] << 8) | (data[3] << 0));
+
+    // extract header from raw data
+    uint32_t newsize = size - 4;
+    byte* datacopy = (byte*) calloc(newsize, 1);
+    if (datacopy == NULL)
+        return DEVICEERR_MALLOCFAIL;
+    memcpy(datacopy, data+4, newsize);
+
+    err = device_execute_command_sc64(device, CMD_DEBUG_WRITE, datatype, datasize, datacopy, newsize, NULL);
+
+    free(datacopy);
+    if (err != DEVICEERR_OK)
+        return err;
+
+    return DEVICEERR_OK;
+}
+
+/*==============================
     device_receivedata_sc64
     Receives data from the SC64
     @param  A pointer to the cart context

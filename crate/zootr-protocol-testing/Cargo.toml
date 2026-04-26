@@ -1,0 +1,10 @@
+[package]
+name = "zootr-protocol-testing"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+repository.workspace = true
+
+[dependencies]
+ctrlc = "3.4"
+n64flashcart = { path = "../n64flashcart" }

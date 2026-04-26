@@ -479,6 +479,21 @@ DeviceError device_senddata_64drive(CartDevice* cart, USBDataType datatype, byte
 
 
 /*==============================
+    device_sendrawdata_64drive
+    Sends raw data to the 64Drive. No cart available to test, so pass through.
+    @param  A pointer to the cart context
+    @param  A buffer containing said data
+    @param  The size of the data
+    @return The device error, or OK
+==============================*/
+
+DeviceError device_sendrawdata_64drive(CartDevice* cart, byte* data, uint32_t size)
+{
+    return device_senddata_64drive(cart, DATATYPE_RAWBINARY, data, size);
+}
+
+
+/*==============================
     device_receivedata_64drive
     Receives data from the 64Drive
     @param  A pointer to the cart context
