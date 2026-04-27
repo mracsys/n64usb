@@ -74,6 +74,8 @@
         DATATYPE_READ_MEMORY     = 0x11,
         DATATYPE_WRITE_MEMORY    = 0x12,
         DATATYPE_UNRECOVERABLE   = 0x13,
+        DATATYPE_ITEM_GIVEN      = 0x14,
+        DATATYPE_PROG_ITEM_STATE = 0x15,
     } USBDataType;
 
     typedef enum {
