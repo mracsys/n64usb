@@ -104,8 +104,14 @@ DeviceError device_senddata_wii(CartDevice* cart, USBDataType datatype, byte* da
     uint32_t header;
     // Pad to alignment on 4-byte boundary + 2 bytes to
     // account for FTDI status bites on console side
-    uint32_t newsize = ALIGN(size, 2) + 4;
-    if (newsize % 4 == 0) newsize += 2;
+    // ---------------------------------------------------------
+    // | Payload | w/Status | Padding | Total | Total w/Status |
+    // |       1 |        3 |       3 |     4 |              6 |
+    // |       2 |        4 |       2 |     4 |              6 |
+    // |       3 |        5 |       3 |     6 |              8 |
+    // |       4 |        6 |       2 |     6 |              8 |
+    // ---------------------------------------------------------
+    uint32_t newsize = ALIGN(size, 2) + 4 + 2;
     byte*    datacopy = NULL;
     uint32_t bytes_done = 0;
     uint32_t bytes_left = newsize;
