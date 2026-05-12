@@ -76,7 +76,21 @@
         DATATYPE_UNRECOVERABLE   = 0x13,
         DATATYPE_ITEM_GIVEN      = 0x14,
         DATATYPE_PROG_ITEM_STATE = 0x15,
+        DATATYPE_SEND_HINT       = 0x16,
+        DATATYPE_SEND_ENTRANCE   = 0x17,
     } USBDataType;
+
+    // Hint types definitions
+    // Start at 1 so that empty hint data can be detected
+    typedef enum {
+        HINTTYPE_WOTH       = 0x01,
+        HINTTYPE_GOAL       = 0x02,
+        HINTTYPE_FOOLISH    = 0x03,
+        HINTTYPE_ITEM       = 0x04,
+        HINTTYPE_LOCATION   = 0x05,
+        HINTTYPE_ENTRANCE   = 0x06,
+        HINTTYPE_MAJOR_ITEM = 0x07,
+    } HintDataType;
 
     typedef enum {
         PROTOCOL_VERSION1   = 0x00, 

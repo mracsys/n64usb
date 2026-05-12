@@ -174,7 +174,7 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "n64flashcart"
-version = "2.0.1"
+version = "2.0.2"
 dependencies = [
  "bindgen",
  "cc",
@@ -320,7 +320,7 @@ dependencies = [
 
 [[package]]
 name = "zootr-protocol-testing"
-version = "2.0.1"
+version = "2.0.2"
 dependencies = [
  "ctrlc",
  "n64flashcart",
@@ -328,7 +328,7 @@ dependencies = [
 
 [[package]]
 name = "zootr-usb-testing"
-version = "2.0.1"
+version = "2.0.2"
 dependencies = [
  "ctrlc",
  "n64flashcart",

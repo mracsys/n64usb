@@ -19,6 +19,7 @@ impl ParseCallbacks for StripEnumPrefix {
             "CartType" => original_variant_name.strip_prefix("CART_"),
             "SaveType" => original_variant_name.strip_prefix("SAVE_"),
             "USBDataType" => original_variant_name.strip_prefix("DATATYPE_"),
+            "HintDataType" => original_variant_name.strip_prefix("HINTTYPE_"),
             "ProtocolVer" => original_variant_name.strip_prefix("PROTOCOL_"),
             _ => None,
         }?;
