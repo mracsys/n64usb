@@ -28,9 +28,11 @@ Requires the following dependencies:
 - libusb-1.0
 - libftdi
 
-Example for Fedora:
+NOTE: Static versions of the libraries are required for building. Some distros may only include dynamic versions.
+
+Example for Debian 13:
 ```bash
-sudo dnf install libusb1-devel libftdi-devel
+sudo apt install build-essential llvm libclang-dev libftdi1-dev libudev-dev pkg-config libglib2.0-dev
 ```
 
 ### macOS
