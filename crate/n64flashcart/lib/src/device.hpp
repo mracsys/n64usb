@@ -78,6 +78,7 @@
         DATATYPE_PROG_ITEM_STATE = 0x15,
         DATATYPE_SEND_HINT       = 0x16,
         DATATYPE_SEND_ENTRANCE   = 0x17,
+        DATATYPE_PLAYER_POS      = 0x18,
     } USBDataType;
 
     // Hint types definitions

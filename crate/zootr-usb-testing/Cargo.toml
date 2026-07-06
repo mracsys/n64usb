@@ -6,5 +6,6 @@ edition.workspace = true
 repository.workspace = true
 
 [dependencies]
+arrayref = "0.3.9"
 ctrlc = "3.4"
 n64flashcart = { path = "../n64flashcart" }
